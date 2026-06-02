@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Money Management MoBi</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Money Management MoBi</h1>
+
+    <div id="userSetup">
+
+        <input
+            type="text"
+            id="username"
+            placeholder="Nama User"
+        >
+
+        <button id="saveUserBtn">
+            Simpan Nama
+        </button>
+
+    </div>
+
+    <div id="formSection" style="display:none">
+
+        <select id="kategori">
+            <option value="">Pilih Kategori</option>
+            <option value="Monik">Monik</option>
+            <option value="Jubil">Jubil</option>
+        </select>
+
+        <input
+            type="text"
+            id="nominal"
+            placeholder="Nominal"
+        >
+
+        <input
+            type="text"
+            id="keterangan"
+            placeholder="Keterangan"
+        >
+
+        <button id="submitBtn">
+            Submit
+        </button>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
