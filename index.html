@@ -1,74 +1,66 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
+submitBtn.addEventListener("click", async () => {
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+```
+const user = localStorage.getItem("mobi_user");
 
-<meta
-    name="theme-color"
-    content="#4285f4"
->
+const kategoriValue = kategori.value.trim();
+const nominalValue = nominal.value.trim();
+const keteranganValue = keterangan.value.trim();
 
-<title>Money Management MoBi</title>
+if(
+    kategoriValue === "" ||
+    nominalValue === "" ||
+    keteranganValue === ""
+){
+    alert("Semua field wajib diisi");
+    return;
+}
 
-<link rel="stylesheet" href="style.css">
+if(!/^\d+$/.test(nominalValue)){
+    alert("Nominal harus berupa angka");
+    return;
+}
 
-</head>
+submitBtn.disabled = true;
+submitBtn.textContent = "Menyimpan...";
 
-<body>
+const url =
+    API_URL +
+    "?action=save" +
+    "&user=" + encodeURIComponent(user) +
+    "&kategori=" + encodeURIComponent(kategoriValue) +
+    "&nominal=" + encodeURIComponent(nominalValue) +
+    "&keterangan=" + encodeURIComponent(keteranganValue);
 
-<div class="container">
+try {
 
-    <h1>Money Management MoBi</h1>
+    const response = await fetch(url);
 
-    <div id="userSetup">
+    const result = await response.json();
 
-        <input
-            type="text"
-            id="username"
-            placeholder="Nama User"
-        >
+    if(result.success){
 
-        <button id="saveUserBtn">
-            Simpan Nama
-        </button>
+        kategori.value = "";
+        nominal.value = "";
+        keterangan.value = "";
 
-    </div>
+        alert("Data berhasil disimpan");
 
-    <div id="formSection" style="display:none">
+    }else{
 
-        <select id="kategori">
-            <option value="">Pilih Kategori</option>
-            <option value="Monik">Monik</option>
-            <option value="Jubil">Jubil</option>
-        </select>
+        alert(result.message);
 
-        <input
-    type="text"
-    id="nominal"
-    inputmode="numeric"
-    placeholder="Nominal"
->
+    }
 
-        <input
-            type="text"
-            id="keterangan"
-            placeholder="Keterangan"
-        >
+} catch(err){
 
-        <button id="submitBtn">
-            Submit
-        </button>
+    console.error(err);
+    alert("Gagal menghubungi server");
 
-    </div>
+}
 
-</div>
+submitBtn.disabled = false;
+submitBtn.textContent = "Submit";
+```
 
-<script src="script.js"></script>
-
-</body>
-</html>
+});
