@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#4285f4">
+
+<title>Money Management MoBi</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+}
+
+.container{
+    max-width:500px;
+    margin:auto;
+    padding:20px;
+    background:white;
+    min-height:100vh;
+}
+
+h1{
+    text-align:center;
+    font-size:24px;
+    margin:20px 0 30px;
+}
+
+input,
+select{
+    width:100%;
+    height:50px;
+    padding:0 15px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    margin-bottom:15px;
+    font-size:16px;
+    outline:none;
+}
+
+input:focus,
+select:focus{
+    border-color:#4285f4;
+}
+
+button{
+    width:100%;
+    height:50px;
+    border:none;
+    border-radius:8px;
+    background:#4285f4;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:disabled{
+    opacity:.7;
+    cursor:not-allowed;
+}
+
+.info{
+    text-align:center;
+    margin-bottom:20px;
+    color:#666;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Money Management MoBi</h1>
+
+    <div id="userSetup">
+
+        <input
+            type="text"
+            id="username"
+            placeholder="Masukkan Nama User">
+
+        <button id="saveUserBtn">
+            Simpan Nama
+        </button>
+
+    </div>
+
+    <div id="formSection" style="display:none;">
+
+        <div class="info" id="userInfo"></div>
+
+        <select id="kategori">
+            <option value="">Pilih Kategori</option>
+            <option value="Monik">Monik</option>
+            <option value="Jubil">Jubil</option>
+        </select>
+
+        <input
+            type="text"
+            id="nominal"
+            inputmode="numeric"
+            placeholder="Nominal">
+
+        <input
+            type="text"
+            id="keterangan"
+            placeholder="Keterangan">
+
+        <button id="submitBtn">
+            Submit
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbyqTH-damlXh9AhFxCqfckIZZDwyoPJBaBYvA3VFeJdWvNU3B6-rh2aP2eIjc3jz-rC/exec";
+
+const userSetup = document.getElementById("userSetup");
+const formSection = document.getElementById("formSection");
+
+const username = document.getElementById("username");
+const saveUserBtn = document.getElementById("saveUserBtn");
+
+const kategori = document.getElementById("kategori");
+const nominal = document.getElementById("nominal");
+const keterangan = document.getElementById("keterangan");
+const submitBtn = document.getElementById("submitBtn");
+const userInfo = document.getElementById("userInfo");
+
+const savedUser = localStorage.getItem("mobi_user");
+
+if(savedUser){
+    showForm(savedUser);
+}
+
+function showForm(user){
+    userSetup.style.display = "none";
+    formSection.style.display = "block";
+    userInfo.innerText = "User : " + user;
+}
+
+saveUserBtn.addEventListener("click", () => {
+
+    const user = username.value.trim();
+
+    if(user === ""){
+        alert("Nama user wajib diisi");
+        return;
+    }
+
+    localStorage.setItem("mobi_user", user);
+
+    showForm(user);
+
+});
+
+nominal.addEventListener("input", () => {
+
+    let value = nominal.value;
+
+    value = value.replace(/\./g, "");
+    value = value.replace(/[^0-9]/g, "");
+
+    nominal.value = value;
+
+});
+
+submitBtn.addEventListener("click", async () => {
+
+    const user = localStorage.getItem("mobi_user");
+
+    const kategoriValue = kategori.value.trim();
+    const nominalValue = nominal.value.trim();
+    const keteranganValue = keterangan.value.trim();
+
+    if(
+        kategoriValue === "" ||
+        nominalValue === "" ||
+        keteranganValue === ""
+    ){
+        alert("Semua field wajib diisi");
+        return;
+    }
+
+    if(!/^\d+$/.test(nominalValue)){
+        alert("Nominal harus berupa angka");
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Menyimpan...";
+
+    const url =
+        API_URL +
+        "?action=save" +
+        "&user=" + encodeURIComponent(user) +
+        "&kategori=" + encodeURIComponent(kategoriValue) +
+        "&nominal=" + encodeURIComponent(nominalValue) +
+        "&keterangan=" + encodeURIComponent(keteranganValue);
+
+    try {
+
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if(result.success){
+
+            kategori.value = "";
+            nominal.value = "";
+            keterangan.value = "";
+
+            alert("Data berhasil disimpan");
+
+        }else{
+
+            alert(result.message || "Gagal menyimpan data");
+
+        }
+
+    } catch(err){
+
+        console.error(err);
+        alert("Gagal menghubungi server");
+
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit";
+
+});
+
+</script>
+
+</body>
+</html>
